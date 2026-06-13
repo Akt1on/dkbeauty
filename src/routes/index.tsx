@@ -1,29 +1,48 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Header } from "@/components/site/Header";
+import { Hero } from "@/components/site/Hero";
+import { About } from "@/components/site/About";
+import { Masters } from "@/components/site/Masters";
+import { Services } from "@/components/site/Services";
+import { Reviews } from "@/components/site/Reviews";
+import { Booking } from "@/components/site/Booking";
+import { Contacts } from "@/components/site/Contacts";
+import { Footer } from "@/components/site/Footer";
+import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
+import { ScrollProgress } from "@/components/site/ScrollProgress";
+import { CookieBanner } from "@/components/site/CookieBanner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "D&K Beauty — салон красоты в Губернском, Чехов" },
+      { name: "description", content: "Стрижки, окрашивание, маникюр, косметология, наращивание ресниц и волос. Ежедневно 9:00–21:00. Ул. Земская, 18, Чехов." },
+      { property: "og:title", content: "D&K Beauty — салон красоты в Чехове" },
+      { property: "og:description", content: "Топ-мастера, 4.9 ★, 268 отзывов. Запишитесь онлайн." },
+      { property: "og:url", content: "/" },
     ],
+    links: [{ rel: "canonical", href: "/" }],
   }),
-  component: Index,
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="bg-[var(--ivory)] text-[var(--ink)]">
+      <ScrollProgress />
+      <Header />
+      <main>
+        <Hero />
+        <About />
+        <Masters />
+        <Services />
+        <Reviews />
+        <Booking />
+        <Contacts />
+      </main>
+      <Footer />
+      <WhatsAppFloat />
+      <CookieBanner />
     </div>
   );
 }
