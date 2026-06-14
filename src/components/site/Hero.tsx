@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Star, Sparkles } from "lucide-react";
+import heroImg from "@/assets/gallery/hero-portrait.jpg";
 
 const heroWords = ["D&K", "Beauty", "—", "салон", "красоты", "в", "Губернском"];
 
@@ -94,24 +95,34 @@ export function Hero() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.6, duration: 1 }}
+          initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.6, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
           className="hidden lg:block lg:col-span-4 relative"
         >
-          <div className="aspect-[3/4] rounded-[28px] overflow-hidden relative shadow-[0_30px_80px_-30px_rgba(44,26,46,0.45)]"
-               style={{ background: "linear-gradient(135deg, #C9A0A0 0%, #B8935A 100%)" }}>
-            <div className="absolute inset-0 noise-overlay opacity-100" />
+          <div className="aspect-[3/4] rounded-[28px] overflow-hidden relative shadow-[0_40px_100px_-30px_rgba(44,26,46,0.55)] ring-1 ring-white/40">
+            <img
+              src={heroImg}
+              alt="Интерьер салона D&K Beauty"
+              width={832}
+              height={1088}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-plum/55 via-plum/5 to-transparent" />
+            <div className="absolute inset-0 noise-overlay opacity-60" />
             <div className="absolute inset-0 flex flex-col justify-end p-8 text-white">
-              <div className="font-display text-5xl leading-none">5+</div>
-              <div className="mt-2 text-sm opacity-90">лет в Губернском</div>
+              <div className="font-display text-6xl leading-none drop-shadow-lg">5+</div>
+              <div className="mt-2 text-sm opacity-95 tracking-wide">лет в Губернском</div>
             </div>
-            <div className="absolute top-6 right-6 w-20 h-20 rounded-full border border-white/40 flex items-center justify-center font-display text-2xl">
+            <div className="absolute top-6 right-6 w-20 h-20 rounded-full border border-white/60 backdrop-blur-sm bg-white/10 flex items-center justify-center font-display text-2xl text-white">
               D&K
             </div>
           </div>
-          <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl border border-[var(--mist)]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }}
+            className="absolute -bottom-6 -left-6 bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white"
+          >
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Сегодня</div>
             <div className="text-sm font-medium text-plum mt-1">Свободно с 14:30</div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>
