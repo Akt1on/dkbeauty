@@ -41,42 +41,43 @@
   --color-mist: var(--mist);
   --color-ink: var(--ink);
 
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", "Cormorant", Georgia, serif;
+  --font-sans: "Karla", "Inter", system-ui, sans-serif;
 }
 
 :root {
-  --radius: 0.875rem;
+  --radius: 0.5rem;
 
-  --ivory: #FAF7F4;
-  --blush: #C9A0A0;
-  --blush-soft: #E8D2D2;
-  --plum: #2C1A2E;
-  --plum-soft: #4A2F4D;
-  --gold: #B8935A;
-  --gold-soft: #D9B987;
-  --mist: #EDE8E3;
-  --ink: #3A2E2E;
+  /* Cherry Blossom palette */
+  --ivory: #fef0f5;          /* background — blossom cream */
+  --blush: #e88aab;          /* mid rose accent */
+  --blush-soft: #f8c8d8;     /* soft petal */
+  --plum: #c45c7c;           /* deep rose — primary headings */
+  --plum-soft: #a34460;
+  --gold: #c45c7c;           /* unified — no metallic gold */
+  --gold-soft: #e88aab;
+  --mist: #f8c8d8;
+  --ink: #6b2a40;            /* dark rose-brown body text */
 
-  --background: #FAF7F4;
-  --foreground: #3A2E2E;
+  --background: #fef0f5;
+  --foreground: #6b2a40;
   --card: #ffffff;
-  --card-foreground: #3A2E2E;
+  --card-foreground: #6b2a40;
   --popover: #ffffff;
-  --popover-foreground: #3A2E2E;
-  --primary: #2C1A2E;
-  --primary-foreground: #FAF7F4;
-  --secondary: #EDE8E3;
-  --secondary-foreground: #2C1A2E;
-  --muted: #EDE8E3;
-  --muted-foreground: #6B5858;
-  --accent: #C9A0A0;
-  --accent-foreground: #2C1A2E;
+  --popover-foreground: #6b2a40;
+  --primary: #c45c7c;
+  --primary-foreground: #fef0f5;
+  --secondary: #f8c8d8;
+  --secondary-foreground: #c45c7c;
+  --muted: #fbe1ea;
+  --muted-foreground: #a36b7e;
+  --accent: #e88aab;
+  --accent-foreground: #ffffff;
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: #ffffff;
-  --border: #E5DDD3;
-  --input: #E5DDD3;
-  --ring: #B8935A;
+  --border: #f1d4de;
+  --input: #f1d4de;
+  --ring: #c45c7c;
 }
 
 @layer base {
@@ -86,10 +87,16 @@
     background-color: var(--color-ivory);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    font-weight: 400;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  h1, h2, h3, h4, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    font-weight: 400;
+  }
+  ::selection { background: var(--blush-soft); color: var(--plum); }
 }
 
 /* Зернистая текстура — премиальный noise overlay */
