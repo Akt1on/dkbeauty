@@ -1,129 +1,148 @@
 import { motion } from "framer-motion";
-import { Star, Sparkles } from "lucide-react";
+import { Star } from "lucide-react";
 import heroImg from "@/assets/gallery/hero-portrait.jpg";
-
-const heroWords = ["D&K", "Beauty", "—", "салон", "красоты", "в", "Губернском"];
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden noise-overlay bg-[var(--ivory)]">
-      <div className="absolute inset-0 hero-pattern opacity-50" />
-      <motion.div
-        className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full blur-3xl opacity-40"
-        style={{ background: "radial-gradient(circle, var(--blush) 0%, transparent 65%)" }}
-        animate={{ x: [0, 40, 0], y: [0, -30, 0], scale: [1, 1.08, 1] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute -bottom-40 -left-32 w-[480px] h-[480px] rounded-full blur-3xl opacity-30"
-        style={{ background: "radial-gradient(circle, var(--gold) 0%, transparent 65%)" }}
-        animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-      />
+    <section className="relative min-h-screen w-full bg-[var(--ivory)] flex items-center pt-24 pb-20 px-5 md:px-10 lg:px-16 overflow-hidden noise-overlay">
+      {/* Decorative oversized background word */}
+      <div
+        className="pointer-events-none select-none absolute -top-20 md:-top-32 -left-6 md:-left-10 italic text-[var(--blush-soft)]/40 font-display leading-none"
+        style={{ fontSize: "clamp(10rem, 28vw, 22rem)" }}
+        aria-hidden
+      >
+        Beauty
+      </div>
 
-      <div className="relative max-w-7xl mx-auto px-5 lg:px-10 w-full grid lg:grid-cols-12 gap-10 items-center">
-        <div className="lg:col-span-8 relative">
-          <motion.div
-            initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
-            className="absolute -left-4 lg:-left-8 top-2 bottom-2 w-[3px] bg-[var(--gold)] origin-top"
-          />
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-[var(--gold)] mb-6"
+      <div className="relative max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        {/* Left — narrative */}
+        <div className="lg:col-span-5 z-10 space-y-8">
+          <motion.header
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
+            className="space-y-5"
           >
-            <Sparkles className="w-3.5 h-3.5" /> Премиальный салон · с 2020
-          </motion.div>
+            <div className="flex items-center gap-4">
+              <span className="h-px w-12 bg-[var(--plum)]" />
+              <span className="uppercase tracking-[0.3em] text-[var(--plum)] text-[11px] font-medium">
+                Chekhov · Premier Studio
+              </span>
+            </div>
 
-          <h1 className="font-display text-plum leading-[1.02]" style={{ fontSize: "clamp(2.5rem, 7vw, 6.5rem)" }}>
-            {heroWords.map((w, i) => (
+            <h1
+              className="font-display text-[var(--plum)] leading-[0.85] font-light"
+              style={{ fontSize: "clamp(3.75rem, 10vw, 9rem)" }}
+            >
               <motion.span
-                key={i}
-                initial={{ y: 80, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 + i * 0.08, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                className="inline-block mr-[0.25em]"
+                initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.15, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                className="block"
               >
-                {w === "&" ? <span className="text-[var(--gold)] italic">&</span> : w}
+                D&K
               </motion.span>
-            ))}
-          </h1>
+              <motion.span
+                initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.32, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                className="block italic pl-10 md:pl-16 lg:pl-24"
+              >
+                Beauty
+              </motion.span>
+            </h1>
+          </motion.header>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0 }}
-            className="mt-7 text-lg md:text-xl text-[var(--ink)]/80 max-w-xl"
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.8 }}
+            className="text-[var(--ink)]/80 text-base md:text-lg leading-relaxed max-w-md font-light"
           >
-            Ул. Земская, 18, Чехов · Ежедневно 9:00–21:00
+            Искусство преображения в самом сердце Чехова. Мы создаём эстетику,
+            которая подчёркивает вашу уникальность через премиальный уход.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}
-            className="mt-9 flex flex-wrap items-center gap-4"
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75, duration: 0.8 }}
+            className="flex flex-wrap items-center gap-3 pt-2"
           >
-            <a href="#booking" className="shimmer-btn inline-flex items-center justify-center rounded-full bg-[var(--blush)] text-white px-8 py-4 text-sm font-medium tracking-wide shadow-[0_10px_30px_-8px_rgba(201,160,160,0.7)] hover:-translate-y-0.5 transition">
-              Записаться онлайн
-            </a>
-            <a href="#services" className="inline-flex items-center justify-center rounded-full border border-plum/30 text-plum px-8 py-4 text-sm font-medium tracking-wide hover:bg-plum hover:text-white transition">
-              Наши услуги
-            </a>
-
-            <motion.div
-              initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.6, type: "spring" }}
-              className="flex items-center gap-2 rounded-full bg-white border border-[var(--gold-soft)] px-4 py-2 animate-soft-pulse"
+            <a
+              href="#booking"
+              className="shimmer-btn px-8 py-4 bg-[var(--plum)] text-white uppercase tracking-[0.25em] text-[11px] font-medium hover:bg-[var(--plum-soft)] transition-colors duration-500 shadow-xl shadow-[var(--plum)]/15"
             >
-              <Star className="w-4 h-4 fill-[var(--gold)] text-[var(--gold)]" />
-              <span className="font-medium text-plum">4.9</span>
-              <span className="text-sm text-muted-foreground">· 268 отзывов</span>
-            </motion.div>
+              Записаться
+            </a>
+            <a
+              href="#services"
+              className="px-8 py-4 border border-[var(--blush)] text-[var(--plum)] uppercase tracking-[0.25em] text-[11px] font-medium hover:bg-[var(--blush-soft)] transition-colors duration-500"
+            >
+              Услуги
+            </a>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}
-            className="mt-12 grid sm:grid-cols-3 gap-5 max-w-2xl"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 0.6 }}
+            className="flex items-center gap-4 pt-4"
           >
-            {[
-              "Топ-мастера по стрижке и окрашиванию",
-              "Маникюр, косметология, шугаринг",
-              "Наращивание ресниц и волос",
-            ].map((t, i) => (
-              <div key={i} className="flex items-start gap-2.5 text-sm text-[var(--ink)]/85">
-                <span className="text-[var(--gold)] mt-0.5">✦</span>
-                <span>{t}</span>
-              </div>
-            ))}
+            <div className="flex items-center gap-2 animate-soft-pulse rounded-full bg-white/70 backdrop-blur border border-[var(--blush-soft)] px-4 py-2">
+              <Star className="w-3.5 h-3.5 fill-[var(--plum)] text-[var(--plum)]" />
+              <span className="font-medium text-[var(--plum)] text-sm">4.9</span>
+              <span className="text-xs text-[var(--ink)]/60">· 268 отзывов</span>
+            </div>
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[var(--ink)]/50">
+              Ежедневно 9:00–21:00
+            </span>
           </motion.div>
         </div>
 
+        {/* Right — editorial imagery */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.6, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-          className="hidden lg:block lg:col-span-4 relative"
+          initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+          className="lg:col-span-7 relative flex justify-end"
         >
-          <div className="aspect-[3/4] rounded-[28px] overflow-hidden relative shadow-[0_40px_100px_-30px_rgba(44,26,46,0.55)] ring-1 ring-white/40">
+          <div className="relative w-full aspect-[4/5] md:w-[88%] overflow-hidden shadow-[0_40px_120px_-30px_rgba(196,92,124,0.45)] bg-white group">
             <img
               src={heroImg}
               alt="Интерьер салона D&K Beauty"
-              width={832}
-              height={1088}
-              className="w-full h-full object-cover"
+              width={1200}
+              height={1500}
+              className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-plum/55 via-plum/5 to-transparent" />
-            <div className="absolute inset-0 noise-overlay opacity-60" />
-            <div className="absolute inset-0 flex flex-col justify-end p-8 text-white">
-              <div className="font-display text-6xl leading-none drop-shadow-lg">5+</div>
-              <div className="mt-2 text-sm opacity-95 tracking-wide">лет в Губернском</div>
-            </div>
-            <div className="absolute top-6 right-6 w-20 h-20 rounded-full border border-white/60 backdrop-blur-sm bg-white/10 flex items-center justify-center font-display text-2xl text-white">
-              D&K
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--plum)]/30 via-transparent to-transparent" />
+
+            {/* Frosted glass card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.15, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute bottom-6 md:bottom-8 -left-4 md:-left-10 max-w-[280px] bg-white/40 backdrop-blur-xl p-6 md:p-8 border border-white/50 shadow-2xl"
+            >
+              <p className="font-display italic text-2xl text-[var(--plum)] mb-2 leading-tight">
+                Editorial Excellence
+              </p>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--plum)]/70 leading-snug">
+                10 категорий услуг: от сложного окрашивания до профессиональной косметологии.
+              </p>
+            </motion.div>
           </div>
+
+          {/* Secondary image detail */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }}
-            className="absolute -bottom-6 -left-6 bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white"
+            initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 1.3, duration: 0.9 }}
+            className="absolute -bottom-12 -right-2 lg:-right-6 w-1/3 aspect-square hidden md:block overflow-hidden border-[6px] md:border-8 border-[var(--ivory)] shadow-xl bg-white"
           >
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Сегодня</div>
-            <div className="text-sm font-medium text-plum mt-1">Свободно с 14:30</div>
+            <img
+              src={heroImg}
+              alt=""
+              aria-hidden
+              className="w-full h-full object-cover scale-[1.4] -translate-y-6"
+            />
           </motion.div>
         </motion.div>
+
+        {/* Vertical scroll label */}
+        <div className="absolute right-0 top-1/2 -rotate-90 origin-right translate-x-12 hidden xl:flex items-center gap-6 pointer-events-none">
+          <span className="h-px w-24 bg-[var(--blush)]" />
+          <span className="uppercase tracking-[0.4em] text-[var(--blush)] text-[10px]">
+            Scroll for inspiration
+          </span>
+        </div>
       </div>
     </section>
   );
