@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { submitBooking } from "@/lib/bookings.functions";
 
 type FormVals = {
   name: string;
@@ -38,17 +40,39 @@ const formatPhone = (v: string) => {
 };
 
 export function Booking() {
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormVals>({
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormVals>({
     defaultValues: { master: "Без предпочтений", consent: false },
   });
+  const submit = useServerFn(submitBooking);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const phone = watch("phone");
   const consent = watch("consent");
 
-  const onSubmit = (vals: FormVals) => {
-    console.log("Заявка:", vals);
-    setDone(true);
-    setTimeout(() => setDone(false), 4000);
+  const onSubmit = async (vals: FormVals) => {
+    setError(null);
+    setLoading(true);
+    try {
+      await submit({
+        data: {
+          name: vals.name,
+          phone: vals.phone,
+          category: vals.category,
+          master: vals.master === "Без предпочтений" ? null : vals.master,
+          preferred_date: vals.date,
+          preferred_time: vals.time,
+          comment: null,
+        },
+      });
+      setDone(true);
+      reset({ master: "Без предпочтений", consent: false } as any);
+      setTimeout(() => setDone(false), 5000);
+    } catch (e: any) {
+      setError("Не удалось отправить заявку. Попробуйте ещё раз или напишите в WhatsApp.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const today = new Date().toISOString().split("T")[0];
