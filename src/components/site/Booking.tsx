@@ -148,12 +148,16 @@ export function Booking() {
           </label>
           {errors.consent && <div className="text-xs text-red-500 mt-1 ml-8">Подтвердите согласие</div>}
 
-          <div
+          {error && <div className="mt-5 rounded-xl bg-red-50 text-red-600 px-4 py-3 text-sm">{error}</div>}
+
+          <button
+            type="button"
             onClick={handleSubmit(onSubmit)}
-            className="shimmer-btn mt-7 w-full rounded-full bg-[var(--blush)] text-white py-4 text-center font-medium cursor-pointer hover:bg-[#b88f8f] transition select-none"
+            disabled={loading}
+            className="shimmer-btn mt-7 w-full rounded-full bg-[var(--blush)] text-white py-4 text-center font-medium cursor-pointer hover:bg-[#b88f8f] transition select-none disabled:opacity-60"
           >
-            {done ? "Заявка отправлена ✓" : "Записаться"}
-          </div>
+            {loading ? "Отправляем…" : done ? "Заявка отправлена ✓" : "Записаться"}
+          </button>
 
           <p className="text-xs text-[var(--ink)]/60 text-center mt-4 leading-relaxed">
             Нажимая кнопку, вы соглашаетесь на обработку персональных данных согласно 152-ФЗ и нашей{" "}
