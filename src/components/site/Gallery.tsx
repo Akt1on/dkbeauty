@@ -1,6 +1,9 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { listPublicGallery } from "@/lib/public-content.functions";
 
 import g1 from "@/assets/gallery/g1-nails.jpg";
 import g2 from "@/assets/gallery/g2-hair.jpg";
@@ -9,22 +12,30 @@ import g4 from "@/assets/gallery/g4-interior.jpg";
 import g5 from "@/assets/gallery/g5-cosmetology.jpg";
 import g6 from "@/assets/gallery/g6-products.jpg";
 
-type Item = { src: string; w: number; h: number; alt: string; tall?: boolean };
+type Item = { src: string; alt: string };
 
-const ITEMS: Item[] = [
-  { src: g1, w: 1024, h: 1024, alt: "Маникюр с нюдовым покрытием" },
-  { src: g2, w: 832, h: 1088, alt: "Окрашивание и укладка волос", tall: true },
-  { src: g3, w: 1088, h: 832, alt: "Наращивание ресниц и оформление бровей" },
-  { src: g4, w: 1088, h: 832, alt: "Интерьер салона D&K Beauty" },
-  { src: g5, w: 832, h: 1088, alt: "Косметологические процедуры", tall: true },
-  { src: g6, w: 1024, h: 1024, alt: "Премиальная косметика" },
+const FALLBACK: Item[] = [
+  { src: g1, alt: "Маникюр с нюдовым покрытием" },
+  { src: g2, alt: "Окрашивание и укладка волос" },
+  { src: g3, alt: "Наращивание ресниц и оформление бровей" },
+  { src: g4, alt: "Интерьер салона D&K Beauty" },
+  { src: g5, alt: "Косметологические процедуры" },
+  { src: g6, alt: "Премиальная косметика" },
 ];
 
 export function Gallery() {
+  const fetchGal = useServerFn(listPublicGallery);
+  const { data = [] } = useQuery({ queryKey: ["public-gallery"], queryFn: () => fetchGal(), staleTime: 60_000 });
+
+  const ITEMS = useMemo<Item[]>(() => {
+    if (data.length === 0) return FALLBACK;
+    return data.map((r) => ({ src: r.image_url, alt: r.alt ?? "" }));
+  }, [data]);
+
   const [idx, setIdx] = useState<number | null>(null);
   const close = useCallback(() => setIdx(null), []);
-  const prev = useCallback(() => setIdx((i) => (i === null ? i : (i - 1 + ITEMS.length) % ITEMS.length)), []);
-  const next = useCallback(() => setIdx((i) => (i === null ? i : (i + 1) % ITEMS.length)), []);
+  const prev = useCallback(() => setIdx((i) => (i === null ? i : (i - 1 + ITEMS.length) % ITEMS.length)), [ITEMS.length]);
+  const next = useCallback(() => setIdx((i) => (i === null ? i : (i + 1) % ITEMS.length)), [ITEMS.length]);
 
   useEffect(() => {
     if (idx === null) return;
@@ -59,27 +70,28 @@ export function Gallery() {
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 [column-fill:_balance]">
           {ITEMS.map((item, i) => (
             <motion.button
-              key={i}
+              key={`${item.src}-${i}`}
               onClick={() => setIdx(i)}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.6, delay: (i % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
               className="group mb-5 block w-full break-inside-avoid overflow-hidden rounded-2xl bg-[var(--mist)] relative cursor-zoom-in"
-              aria-label={`Открыть фото: ${item.alt}`}
+              aria-label={`Открыть фото: ${item.alt || "работа из портфолио"}`}
             >
               <img
                 src={item.src}
                 alt={item.alt}
                 loading="lazy"
-                width={item.w}
-                height={item.h}
+                decoding="async"
                 className="w-full h-auto block transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-plum/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 text-white text-sm translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-500">
-                {item.alt}
-              </div>
+              {item.alt && (
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white text-sm translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-500">
+                  {item.alt}
+                </div>
+              )}
             </motion.button>
           ))}
         </div>

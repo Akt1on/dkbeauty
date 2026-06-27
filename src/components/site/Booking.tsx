@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
@@ -13,6 +13,7 @@ type FormVals = {
   date: string;
   time: string;
   consent: boolean;
+  website: string; // honeypot
 };
 
 const CATEGORIES = ["Маникюр / педикюр","Стрижка","Окрашивание волос","Укладка / причёска","Уходы для волос","Брови и ресницы","Косметология","Инъекции","Шугаринг","Наращивание волос"];
@@ -41,12 +42,13 @@ const formatPhone = (v: string) => {
 
 export function Booking() {
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormVals>({
-    defaultValues: { master: "Без предпочтений", consent: false },
+    defaultValues: { master: "Без предпочтений", consent: false, website: "" },
   });
   const submit = useServerFn(submitBooking);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const mounted = useRef(Date.now());
   const phone = watch("phone");
   const consent = watch("consent");
 
@@ -54,7 +56,7 @@ export function Booking() {
     setError(null);
     setLoading(true);
     try {
-      await submit({
+      const res = await submit({
         data: {
           name: vals.name,
           phone: vals.phone,
@@ -63,13 +65,17 @@ export function Booking() {
           preferred_date: vals.date,
           preferred_time: vals.time,
           comment: null,
+          website: vals.website ?? "",
+          filled_ms: Date.now() - mounted.current,
         },
       });
+      if (res.id === "bot-discarded") return;
       setDone(true);
-      reset({ master: "Без предпочтений", consent: false } as any);
+      reset({ master: "Без предпочтений", consent: false, website: "" } as any);
+      mounted.current = Date.now();
       setTimeout(() => setDone(false), 5000);
     } catch (e: any) {
-      setError("Не удалось отправить заявку. Попробуйте ещё раз или напишите в WhatsApp.");
+      setError(e?.message?.includes("Слишком") ? e.message : "Не удалось отправить заявку. Попробуйте ещё раз или напишите в WhatsApp.");
     } finally {
       setLoading(false);
     }
@@ -105,16 +111,21 @@ export function Booking() {
           initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
           className="bg-[var(--ivory)] text-[var(--ink)] rounded-3xl p-7 md:p-12 shadow-2xl"
         >
+          {/* Honeypot: invisible to humans, irresistible to bots */}
+          <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+            <label>Website<input type="text" tabIndex={-1} autoComplete="off" {...register("website")} /></label>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-5">
             {field("Имя *", errors.name?.message,
-              <input {...register("name", { required: "Укажите имя" })} placeholder="Ваше имя" className={inputCls} />
+              <input {...register("name", { required: "Укажите имя" })} placeholder="Ваше имя" className={inputCls} autoComplete="name" />
             )}
             {field("Телефон *", errors.phone?.message,
               <input
                 {...register("phone", { required: "Укажите телефон", minLength: { value: 17, message: "Введите телефон полностью" } })}
                 value={phone || ""}
                 onChange={(e) => setValue("phone", formatPhone(e.target.value), { shouldValidate: true })}
-                placeholder="+7 (___) ___-__-__" className={inputCls} inputMode="tel"
+                placeholder="+7 (___) ___-__-__" className={inputCls} inputMode="tel" autoComplete="tel"
               />
             )}
             {field("Категория услуги *", errors.category?.message,

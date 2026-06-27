@@ -1,0 +1,13 @@
+{
+  "name": "D&K Beauty",
+  "short_name": "D&K Beauty",
+  "description": "Салон красоты D&K Beauty в мкр. Губернский, Чехов.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fef0f5",
+  "theme_color": "#c45c7c",
+  "lang": "ru",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }
+  ]
+}
