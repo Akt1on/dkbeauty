@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { listPublicReviews } from "@/lib/public-content.functions";
 
 const BARS = [
   { label: "Персонал", value: 90, count: "128 отзывов" },
@@ -11,14 +14,6 @@ const BARS = [
   { label: "Время ожидания", value: 79, count: "25 отзывов" },
   { label: "Окрашивание", value: 88, count: "16 отзывов" },
   { label: "Педикюр", value: 93, count: "14 отзывов" },
-];
-
-const REVIEWS = [
-  { name: "Алина Ф.", date: "Май 2026", level: "Эксперт уровень 4", text: "Высокий профессионализм, уютная атмосфера и шикарные результаты! Маргарита — наращивание волос с точностью до мелочей. Бровист Марина — шикарные брови, быстро и качественно. Топ-мастер Дорина который год радует шикарными стрижками и окрашиванием — после неё волосы начали расти и стали гуще!" },
-  { name: "Татьяна Шибаникова", date: "Апрель 2026", level: "Эксперт уровень 7", text: "Приветливый администратор — чай, кофе. Езжу из Серпухова к Дорине специально. Потрясающий блонд, стрижка супер, укладка без заморочек. Всем рекомендую!" },
-  { name: "Елена Чистякова", date: "Февраль 2026", level: "Эксперт уровень 6", text: "В одном месте всё необходимое: топ-мастера маникюра, стилист Дорина, бровист Яна (коррекция, окрашивание, ламинирование, перманент), мастер по ресницам и косметолог. Администраторы всегда подберут удобное время и напомнят о записи." },
-  { name: "Илья Б.", date: "Июнь 2026", level: "", text: "Мастер маникюра и педикюра Эля порадовала мастерством! Все девчонки в этом салоне работают на 100%. Так держать!" },
-  { name: "Елена Терина", date: "Май 2026", level: "", text: "Лучшее место. Лучшие мастера. Кристиночка — боксёрские косы высшего класса. Талантливая, энергичная, профессиональная, аккуратная." },
 ];
 
 function Counter({ to, decimals = 0, suffix = "" }: { to: number; decimals?: number; suffix?: string }) {
@@ -61,12 +56,22 @@ function Bar({ label, value, count }: { label: string; value: number; count: str
   );
 }
 
+const MONTHS = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+const formatDate = (iso: string) => {
+  const d = new Date(iso);
+  return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+};
+
 export function Reviews() {
+  const fetchRev = useServerFn(listPublicReviews);
+  const { data: REVIEWS = [] } = useQuery({ queryKey: ["public-reviews"], queryFn: () => fetchRev(), staleTime: 60_000 });
+
   const [idx, setIdx] = useState(0);
   useEffect(() => {
+    if (REVIEWS.length < 2) return;
     const t = setInterval(() => setIdx((i) => (i + 1) % REVIEWS.length), 5500);
     return () => clearInterval(t);
-  }, []);
+  }, [REVIEWS.length]);
 
   return (
     <section id="reviews" className="relative py-24 md:py-32 bg-[var(--mist)]/40 noise-overlay">
@@ -96,6 +101,7 @@ export function Reviews() {
           </div>
         </div>
 
+        {REVIEWS.length > 0 && (
         <div className="relative">
           <div className="overflow-hidden">
             <motion.div
@@ -103,20 +109,20 @@ export function Reviews() {
               transition={{ type: "spring", stiffness: 60, damping: 18 }}
               className="flex"
             >
-              {REVIEWS.map((r, i) => (
-                <div key={i} className="min-w-full px-2">
+              {REVIEWS.map((r) => (
+                <div key={r.id} className="min-w-full px-2">
                   <div className="bg-white rounded-3xl p-8 md:p-12 border border-[var(--mist)] shadow-[0_30px_60px_-30px_rgba(44,26,46,0.2)] max-w-3xl mx-auto">
                     <div className="flex gap-0.5 mb-5">
-                      {[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 fill-[var(--gold)] text-[var(--gold)]" />)}
+                      {[...Array(r.rating)].map((_, j) => <Star key={j} className="w-4 h-4 fill-[var(--gold)] text-[var(--gold)]" />)}
                     </div>
                     <p className="text-lg md:text-xl text-[var(--ink)] leading-relaxed font-display italic">«{r.text}»</p>
                     <div className="mt-7 flex items-center gap-4">
                       <div className="w-11 h-11 rounded-full flex items-center justify-center font-display text-white" style={{ background: "linear-gradient(135deg, var(--blush), var(--gold))" }}>
-                        {r.name[0]}
+                        {r.author[0]}
                       </div>
                       <div>
-                        <div className="font-medium text-plum">{r.name}</div>
-                        <div className="text-xs text-muted-foreground">{r.date}{r.level && ` · ${r.level}`}</div>
+                        <div className="font-medium text-plum">{r.author}</div>
+                        <div className="text-xs text-muted-foreground">{formatDate(r.created_at)}{r.source && ` · ${r.source}`}</div>
                       </div>
                     </div>
                   </div>
@@ -126,19 +132,20 @@ export function Reviews() {
           </div>
 
           <div className="flex justify-center gap-3 mt-8">
-            <button onClick={() => setIdx((idx - 1 + REVIEWS.length) % REVIEWS.length)} className="w-11 h-11 rounded-full border border-[var(--plum)]/20 text-plum flex items-center justify-center hover:bg-plum hover:text-white transition">
+            <button aria-label="Предыдущий отзыв" onClick={() => setIdx((idx - 1 + REVIEWS.length) % REVIEWS.length)} className="w-11 h-11 rounded-full border border-[var(--plum)]/20 text-plum flex items-center justify-center hover:bg-plum hover:text-white transition">
               <ChevronLeft className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-2">
               {REVIEWS.map((_, i) => (
-                <button key={i} onClick={() => setIdx(i)} className={`h-1.5 rounded-full transition-all ${i === idx ? "w-8 bg-[var(--blush)]" : "w-1.5 bg-[var(--mist)]"}`} />
+                <button key={i} aria-label={`Отзыв ${i + 1}`} onClick={() => setIdx(i)} className={`h-1.5 rounded-full transition-all ${i === idx ? "w-8 bg-[var(--blush)]" : "w-1.5 bg-[var(--mist)]"}`} />
               ))}
             </div>
-            <button onClick={() => setIdx((idx + 1) % REVIEWS.length)} className="w-11 h-11 rounded-full border border-[var(--plum)]/20 text-plum flex items-center justify-center hover:bg-plum hover:text-white transition">
+            <button aria-label="Следующий отзыв" onClick={() => setIdx((idx + 1) % REVIEWS.length)} className="w-11 h-11 rounded-full border border-[var(--plum)]/20 text-plum flex items-center justify-center hover:bg-plum hover:text-white transition">
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         </div>
+        )}
       </div>
     </section>
   );

@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 const bookingSchema = z.object({
@@ -9,32 +10,33 @@ const bookingSchema = z.object({
   preferred_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   preferred_time: z.string().regex(/^\d{2}:\d{2}$/),
   comment: z.string().trim().max(1000).optional().nullable(),
+  // Honeypot — bots fill all fields including hidden ones. Must be empty.
+  website: z.string().max(0).optional().nullable(),
+  // Anti-instant-submit: time spent on the form (ms). Real users take >1.5s.
+  filled_ms: z.number().int().min(0).max(86_400_000).optional(),
 });
 
 export type BookingInput = z.infer<typeof bookingSchema>;
 
-async function notifyTelegram(booking: BookingInput, id: string): Promise<boolean> {
+async function notifyTelegram(b: BookingInput, id: string): Promise<boolean> {
   const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
   const TELEGRAM_API_KEY = process.env.TELEGRAM_API_KEY;
   if (!LOVABLE_API_KEY || !TELEGRAM_API_KEY) return false;
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: chatRow } = await supabaseAdmin
-    .from("app_settings")
-    .select("value")
-    .eq("key", "telegram_admin_chat_id")
-    .maybeSingle();
+    .from("app_settings").select("value").eq("key", "telegram_admin_chat_id").maybeSingle();
   const chatId = chatRow?.value;
   if (!chatId) return false;
 
   const text =
     `🌸 <b>Новая заявка D&K Beauty</b>\n\n` +
-    `👤 <b>${booking.name}</b>\n` +
-    `📞 ${booking.phone}\n` +
-    `💅 ${booking.category}\n` +
-    (booking.master ? `✨ Мастер: ${booking.master}\n` : "") +
-    `📅 ${booking.preferred_date} в ${booking.preferred_time}\n` +
-    (booking.comment ? `💬 ${booking.comment}\n` : "") +
+    `👤 <b>${b.name}</b>\n` +
+    `📞 ${b.phone}\n` +
+    `💅 ${b.category}\n` +
+    (b.master ? `✨ Мастер: ${b.master}\n` : "") +
+    `📅 ${b.preferred_date} в ${b.preferred_time}\n` +
+    (b.comment ? `💬 ${b.comment}\n` : "") +
     `\n<code>ID: ${id}</code>`;
 
   try {
@@ -54,23 +56,57 @@ async function notifyTelegram(booking: BookingInput, id: string): Promise<boolea
   }
 }
 
+async function checkRateLimit(supabaseAdmin: any, ip: string): Promise<boolean> {
+  const LIMIT = 5; // requests
+  const WINDOW_MIN = 10;
+  const now = new Date();
+  const { data: row } = await supabaseAdmin
+    .from("booking_rate_limit").select("count,window_start").eq("ip", ip).maybeSingle();
+  if (!row) {
+    await supabaseAdmin.from("booking_rate_limit").insert({ ip, count: 1, window_start: now.toISOString() });
+    return true;
+  }
+  const ageMin = (now.getTime() - new Date(row.window_start).getTime()) / 60_000;
+  if (ageMin > WINDOW_MIN) {
+    await supabaseAdmin.from("booking_rate_limit").update({ count: 1, window_start: now.toISOString() }).eq("ip", ip);
+    return true;
+  }
+  if (row.count >= LIMIT) return false;
+  await supabaseAdmin.from("booking_rate_limit").update({ count: row.count + 1 }).eq("ip", ip);
+  return true;
+}
+
 export const submitBooking = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => bookingSchema.parse(d))
   .handler(async ({ data }) => {
+    // Honeypot — silently succeed without persisting
+    if (data.website && data.website.length > 0) {
+      return { ok: true as const, id: "bot-discarded", notified: false };
+    }
+    // Anti-instant-submit
+    if (typeof data.filled_ms === "number" && data.filled_ms < 1500) {
+      throw new Error("Слишком быстрая отправка. Попробуйте ещё раз.");
+    }
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Rate limit per IP
+    const fwd = getRequestHeader("x-forwarded-for") ?? getRequestHeader("cf-connecting-ip") ?? "";
+    const ip = (fwd.split(",")[0] ?? "").trim() || "unknown";
+    const allowed = await checkRateLimit(supabaseAdmin, ip);
+    if (!allowed) {
+      throw new Error("Слишком много заявок. Подождите 10 минут или напишите в WhatsApp.");
+    }
+
     const { data: row, error } = await supabaseAdmin
       .from("bookings")
       .insert({
-        name: data.name,
-        phone: data.phone,
-        category: data.category,
+        name: data.name, phone: data.phone, category: data.category,
         master: data.master ?? null,
-        preferred_date: data.preferred_date,
-        preferred_time: data.preferred_time,
+        preferred_date: data.preferred_date, preferred_time: data.preferred_time,
         comment: data.comment ?? null,
       })
-      .select("id")
-      .single();
+      .select("id").single();
     if (error || !row) throw new Error(error?.message ?? "Insert failed");
 
     const sent = await notifyTelegram(data, row.id);
