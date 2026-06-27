@@ -12,4 +12,7 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Outside Lovable's managed build (e.g. Vercel CI) Nitro emits the Vercel
+  // Build Output API into .vercel/output. Inside Lovable, Cloudflare is forced.
+  nitro: { preset: "vercel" },
 });
