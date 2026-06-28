@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listPublicGallery } from "@/lib/public-content.functions";
+import { listPublicGallery } from "@/lib/publicContent.functions";
 
 import g1 from "@/assets/gallery/g1-nails.jpg";
 import g2 from "@/assets/gallery/g2-hair.jpg";

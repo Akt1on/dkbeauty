@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listPublicServices } from "@/lib/public-content.functions";
+import { listPublicServices } from "@/lib/publicContent.functions";
 
 // Per-category presentation metadata (notes + CTA buttons). Pricing comes from DB.
 const META: Record<string, { note?: string; cta?: { label: string; href: string } }> = {
