@@ -9,7 +9,7 @@ import {
   adminListServices, adminUpsertService, adminDeleteService,
   adminListGallery, adminUpsertGallery, adminDeleteGallery,
   adminListReviews, adminUpsertReview, adminDeleteReview,
-} from "@/lib/admin-content.functions";
+} from "@/lib/adminContent.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,

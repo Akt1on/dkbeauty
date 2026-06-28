@@ -3,7 +3,7 @@ import { motion, useInView } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listPublicReviews } from "@/lib/public-content.functions";
+import { listPublicReviews } from "@/lib/publicContent.functions";
 
 const BARS = [
   { label: "Персонал", value: 90, count: "128 отзывов" },
