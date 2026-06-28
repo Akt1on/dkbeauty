@@ -91,7 +91,8 @@ export const submitBooking = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Rate limit per IP
-    const fwd = getRequestHeader("x-forwarded-for") ?? getRequestHeader("cf-connecting-ip") ?? "";
+    const req = getRequest();
+    const fwd = req?.headers.get("x-forwarded-for") ?? req?.headers.get("cf-connecting-ip") ?? "";
     const ip = (fwd.split(",")[0] ?? "").trim() || "unknown";
     const allowed = await checkRateLimit(supabaseAdmin, ip);
     if (!allowed) {
