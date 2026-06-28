@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeader } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 const bookingSchema = z.object({
@@ -91,7 +91,8 @@ export const submitBooking = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Rate limit per IP
-    const fwd = getRequestHeader("x-forwarded-for") ?? getRequestHeader("cf-connecting-ip") ?? "";
+    const req = getRequest();
+    const fwd = req?.headers.get("x-forwarded-for") ?? req?.headers.get("cf-connecting-ip") ?? "";
     const ip = (fwd.split(",")[0] ?? "").trim() || "unknown";
     const allowed = await checkRateLimit(supabaseAdmin, ip);
     if (!allowed) {
